@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Інформація про користувача</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .user-card {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .user-card h2 {
+            margin: 0 0 15px 0;
+            color: #333;
+        }
+
+        .user-info {
+            text-align: left;
+            margin-bottom: 15px;
+        }
+
+        .user-info p {
+            margin: 10px 0;
+            color: #555;
+        }
+
+        .user-info span {
+            font-weight: bold;
+            color: #222;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #007BFF;
+            color: #fff;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 1px;
+            transition: background-color 0.3s ease;
+            width: 80%;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        a {
+            color:  white;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="user-card">
+        <h2>Інформація про користувача</h2>
+        <div class="user-info">
+            <p><span>Ім'я:</span>{{.name}}</p>
+            <p><span>Пошта:</span>{{.email}}</p>
+            <p><span>Пароль:</span>{{.password}}</p>
+        </div>
+        <a href="http://localhost:8081/todo/id={{ .id }}"><button class="btn">Мої задачі</button></a>
+    </div>
+</body>
+</html>

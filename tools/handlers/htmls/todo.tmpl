@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список завдань</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .todo-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        .todo-item:last-child {
+            border-bottom: none;
+        }
+        .todo-item input[type="checkbox"] {
+            margin-right: 15px;
+        }
+        .completed {
+            text-decoration: line-through;
+            color: gray;
+        }
+        .status {
+            font-weight: bold;
+        }
+        .done {
+            color: green;
+        }
+        .undone {
+            color: red;
+        }
+        #new-task {
+            width: 96%;
+            padding: 10px;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+        .add-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        .add-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Список завдань</h1>
+        {{ range .Todos }}
+        <div id="uid_todo" style="display: none;">{{ .UID }}</div>
+        <div class="todo-item">
+            <div>
+                <input type="checkbox" id="task{{ .ID }}" onclick="toggleComplete(this, {{ .ID }})" {{ if .Done }}checked{{ end }}>
+                <label id="title_todo{{ .ID }}" for="task{{ .ID }}" class="{{ if .Done }}completed{{ end }}">{{ .Title }}</label>
+            </div>
+        </div>
+        {{ end }}
+        <input type="text" id="new-task" placeholder="Введіть нове завдання...">
+        <button class="add-btn" onclick="addTask()">Додати завдання</button>
+    </div>
+
+    <script>
+        function toggleComplete(checkbox, taskID) {
+            const label = checkbox.nextElementSibling;
+            if (checkbox.checked) {
+                label.classList.add('completed');
+            } else {
+                label.classList.remove('completed');
+            }
+            const itemIdElement = document.getElementById('title_todo' + taskID);
+            const itemId = itemIdElement.innerText;
+            const isChecked = checkbox.checked;
+            fetch("/todo/update_task", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    ID: itemId,
+                    Done: isChecked
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.message);
+            })
+            .catch(error => {
+                console.error("Помилка:", error);
+            });
+        }
+
+        function addTask() {
+            const taskTitle = document.getElementById('new-task').value;
+            if (!taskTitle) {
+                alert('Будь ласка, введіть назву завдання.');
+                return;
+            }
+            const uid_element = document.getElementById('uid_todo')
+            const uid = uid_element.innerText
+            fetch("/todo/add_task", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    UID: uid,
+                    Title: taskTitle
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.message);
+                location.reload();
+            })
+            .catch(error => {
+                console.error("Помилка:", error);
+            });
+            location.reload(true)
+        }
+    </script>
+</body>
+</html>
