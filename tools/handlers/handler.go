@@ -32,6 +32,9 @@ func InitHandlers(storage *storage.Storage) *Router {
 		todo.POST("/add_task", func(c *gin.Context) {
 			HandlePushTodo(c, storage)
 		})
+		todo.POST("/delete_task", func(c *gin.Context) {
+			HandleDeleteTodo(c, storage)
+		})
 	}
 	return &Router{
 		Router: router,

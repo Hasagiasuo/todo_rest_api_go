@@ -68,6 +68,16 @@
         .add-btn:hover {
             background-color: #45a049;
         }
+        .delete-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .delete-btn:hover {
+            background-color: #e53935;
+        }
     </style>
 </head>
 <body>
@@ -80,6 +90,7 @@
                 <input type="checkbox" id="task{{ .ID }}" onclick="toggleComplete(this, {{ .ID }})" {{ if .Done }}checked{{ end }}>
                 <label id="title_todo{{ .ID }}" for="task{{ .ID }}" class="{{ if .Done }}completed{{ end }}">{{ .Title }}</label>
             </div>
+            <button class="delete-btn" onclick="deleteTask({{ .ID }})">Видалити</button>
         </div>
         {{ end }}
         <input type="text" id="new-task" placeholder="Введіть нове завдання...">
@@ -142,7 +153,27 @@
             .catch(error => {
                 console.error("Помилка:", error);
             });
-            location.reload(true)
+        }
+
+        function deleteTask(taskID) {
+            fetch("/todo/delete_task", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    ID: taskID
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.message);
+                // Перезавантажити сторінку після видалення
+                location.reload();
+            })
+            .catch(error => {
+                console.error("Помилка:", error);
+            });
         }
     </script>
 </body>

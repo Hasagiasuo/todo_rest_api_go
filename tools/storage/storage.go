@@ -117,13 +117,27 @@ func (storage Storage) GetIDByTitle(title string) string {
 }
 
 func (storage Storage) PushTodoByUID(title string, uid string) {
-	storage.Logger.Info(fmt.Sprintf("Title: %s, UID: %s", title, uid))
+	var tmp string = ""
+	get_q := `SELECT title FROM todo WHERE title=$1`
+	storage.DataBase.Get(&tmp, get_q, title)
+	if tmp != "" {
+		storage.Logger.Info("Item already exists")
+		return
+	}
 	query := `INSERT INTO todo (uid, title, done) VALUES ($1, $2, false);`
 	i_uid, err := strconv.Atoi(uid)
 	if err != nil {
 		storage.Logger.Info("Cannot convert UID")
+		return
 	}
 	if _, err := storage.DataBase.Exec(query, i_uid, title); err != nil {
 		storage.Logger.Info(fmt.Sprintf("Cannot insert new todo item: %s", err.Error()))
+	}
+}
+
+func (storage Storage) DeleteTodoByTitle(title string) {
+	query := `DELETE FROM todo WHERE title=$1;`
+	if _, err := storage.DataBase.Exec(query, title); err != nil {
+		storage.Logger.Info(fmt.Sprintf("Cannot delete item: %s", err.Error()))
 	}
 }

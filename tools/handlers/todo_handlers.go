@@ -42,3 +42,7 @@ func HandlePushTodo(c *gin.Context, storage *storage.Storage) {
 	storage.PushTodoByUID(answ.Title, answ.UID)
 	storage.Logger.Info("New task pushed")
 }
+
+func HandleDeleteTodo(c *gin.Context, storage *storage.Storage) {
+	
+}
