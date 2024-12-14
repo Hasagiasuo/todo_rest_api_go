@@ -24,3 +24,7 @@ func PostUser(c *gin.Context) {
 func GetUsers(c *gin.Context) {
 
 }
+
+func PushUser(c *gin.Context, storage *storage.Storage) {
+	
+}

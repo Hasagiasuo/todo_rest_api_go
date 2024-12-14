@@ -20,6 +20,9 @@ func InitHandlers(storage *storage.Storage) *Router {
 		user.GET("/id=:id", func(c *gin.Context) {
 			GetUserById(c, storage)
 		})
+		user.POST("/", func(c *gin.Context) {
+			PushUser(c, storage)
+		})
 	}
 	todo := router.Group("/todo")
 	{

@@ -7,7 +7,6 @@ import (
 	"pet_pr/tools/configs"
 	"pet_pr/tools/models"
 	"strconv"
-
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
@@ -143,6 +142,15 @@ func (storage Storage) DeleteTodoByID(id string) error {
 	if _, err := storage.DataBase.Exec(query, id); err != nil {
 		storage.Logger.Info(fmt.Sprintf("Cannot delete item: %s", err.Error()))
 		return errors.New("CANNOT DELETE")
+	}
+	return nil
+}
+
+func (storage Storage) CreateNewUser(name string, email string, password string) error {
+	query := `INSERT INTO users (name, email, password) VALUES ($1, $2, $3)`
+	if _, err := storage.DataBase.Exec(query, name, email, password); err != nil {
+		storage.Logger.Info(fmt.Sprintf("Cannot push user: %s", err.Error()))
+		return errors.New("CANNOT PUSH USER")
 	}
 	return nil
 }
