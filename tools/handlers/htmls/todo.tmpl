@@ -85,12 +85,13 @@
         <h1>Список завдань</h1>
         {{ range .Todos }}
         <div id="uid_todo" style="display: none;">{{ .UID }}</div>
+        <div id="id_todo" style="display: none;">{{ .ID }}</div>
         <div class="todo-item">
             <div>
                 <input type="checkbox" id="task{{ .ID }}" onclick="toggleComplete(this, {{ .ID }})" {{ if .Done }}checked{{ end }}>
                 <label id="title_todo{{ .ID }}" for="task{{ .ID }}" class="{{ if .Done }}completed{{ end }}">{{ .Title }}</label>
             </div>
-            <button class="delete-btn" onclick="deleteTask({{ .ID }})">Видалити</button>
+            <button class="delete-btn" onclick="deleteTask()">Видалити</button>
         </div>
         {{ end }}
         <input type="text" id="new-task" placeholder="Введіть нове завдання...">
@@ -147,7 +148,6 @@
             })
             .then(response => response.json())
             .then(data => {
-                console.log(data.message);
                 location.reload();
             })
             .catch(error => {
@@ -155,21 +155,21 @@
             });
         }
 
-        function deleteTask(taskID) {
+        function deleteTask() {
+            const id_todo = document.getElementById('id_todo')
+            const id = id_todo.innerText
             fetch("/todo/delete_task", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    ID: taskID
+                    ID: id
                 })
             })
             .then(response => response.json())
             .then(data => {
-                console.log(data.message);
-                // Перезавантажити сторінку після видалення
-                location.reload();
+                location.reload()
             })
             .catch(error => {
                 console.error("Помилка:", error);

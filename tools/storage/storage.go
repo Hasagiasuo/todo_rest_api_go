@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"errors"
 	"fmt"
 	"log/slog"
 	"pet_pr/tools/configs"
@@ -116,28 +117,32 @@ func (storage Storage) GetIDByTitle(title string) string {
 	return id
 }
 
-func (storage Storage) PushTodoByUID(title string, uid string) {
+func (storage Storage) PushTodoByUID(title string, uid string) error {
 	var tmp string = ""
 	get_q := `SELECT title FROM todo WHERE title=$1`
 	storage.DataBase.Get(&tmp, get_q, title)
 	if tmp != "" {
 		storage.Logger.Info("Item already exists")
-		return
+		return errors.New("ITEM ALREADY EXISTS")
 	}
 	query := `INSERT INTO todo (uid, title, done) VALUES ($1, $2, false);`
 	i_uid, err := strconv.Atoi(uid)
 	if err != nil {
 		storage.Logger.Info("Cannot convert UID")
-		return
+		return errors.New("CANNOT CONVERT UID")
 	}
 	if _, err := storage.DataBase.Exec(query, i_uid, title); err != nil {
 		storage.Logger.Info(fmt.Sprintf("Cannot insert new todo item: %s", err.Error()))
+		return errors.New("CANNOT INSERT NEW TODO")
 	}
+	return nil
 }
 
-func (storage Storage) DeleteTodoByTitle(title string) {
-	query := `DELETE FROM todo WHERE title=$1;`
-	if _, err := storage.DataBase.Exec(query, title); err != nil {
+func (storage Storage) DeleteTodoByID(id string) error {
+	query := `DELETE FROM todo WHERE id=$1;`
+	if _, err := storage.DataBase.Exec(query, id); err != nil {
 		storage.Logger.Info(fmt.Sprintf("Cannot delete item: %s", err.Error()))
+		return errors.New("CANNOT DELETE")
 	}
+	return nil
 }
