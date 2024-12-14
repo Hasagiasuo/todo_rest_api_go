@@ -22,7 +22,7 @@
 ### Клонирование репозитория
 
 ```bash
-git clone https://github.com/username/todo_rest_api_go.git
+git clone https://github.com/Hasagiasuo/todo_rest_api_go.git
 cd todo_rest_api_go
 ```
 
