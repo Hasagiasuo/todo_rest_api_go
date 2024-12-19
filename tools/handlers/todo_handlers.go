@@ -9,11 +9,16 @@ import (
 )
 
 func HandleUserTodo(c *gin.Context, storage *storage.Storage) {
-	id := c.Param("id")
-	todos := storage.GetUserTodosByUID(id)
+	uid, err := c.Cookie("uid")
+	if err != nil {
+		storage.Logger.Info("Cannot give uid")
+	}
+	user := storage.GetUserById(uid)
+	todos := storage.GetUserTodosByUID(uid)
 	c.HTML(http.StatusOK, "todo.tmpl", gin.H {
 		"Todos": todos,
- 	})
+		"Name": user.Name,
+	})
 }
 
 func HandleAnswerTodo(c *gin.Context, storage *storage.Storage) {
@@ -30,16 +35,19 @@ func HandleAnswerTodo(c *gin.Context, storage *storage.Storage) {
 
 func HandlePushTodo(c *gin.Context, storage *storage.Storage) {
 	type Req struct {
-		UID string
 		Title string
 	}
 	var answ Req
+	uid, err := c.Cookie("uid")
+	if err != nil {
+		storage.Logger.Info(fmt.Sprintf("Cannot parse cookie: %s", err.Error()))
+	}
 	if err := c.BindJSON(&answ); err != nil {
 		storage.Logger.Info(fmt.Sprintf("Cannot parse answer: %s", err.Error()))
 		c.JSON(http.StatusBadRequest, "Not update")
 		return
 	}
-	if err := storage.PushTodoByUID(answ.Title, answ.UID); err != nil {
+	if err := storage.PushTodoByUID(answ.Title, uid); err != nil {
 		storage.Logger.Info(err.Error())
 		c.JSON(http.StatusBadRequest, err.Error())
 		return

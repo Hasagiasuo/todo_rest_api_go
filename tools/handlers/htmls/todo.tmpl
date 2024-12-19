@@ -78,27 +78,69 @@
         .delete-btn:hover {
             background-color: #e53935;
         }
+        .user-menu {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 16px;
+        }
+        .user-menu a {
+            text-decoration: none;
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .user-menu a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
+    <div class="user-menu">
+        {{ if .Name }}
+            Ласкаво просимо, <strong>{{ .Name }}</strong> | <button style="border: none; cursor: pointer; background-color: rgba(0, 0, 0, 0); color: #4CAF50;" onclick="logout()">Вийти</button>
+        {{ else }}
+            <a href="/login">Увійти</a>
+        {{ end }}
+    </div>
+
     <div class="container">
         <h1>Список завдань</h1>
         {{ range .Todos }}
-        <div id="uid_todo" style="display: none;">{{ .UID }}</div>
-        <div id="id_todo" style="display: none;">{{ .ID }}</div>
+        <div id="id_todo_{{ .ID }}" style="display: none;">{{ .ID }}</div>
         <div class="todo-item">
             <div>
                 <input type="checkbox" id="task{{ .ID }}" onclick="toggleComplete(this, {{ .ID }})" {{ if .Done }}checked{{ end }}>
                 <label id="title_todo{{ .ID }}" for="task{{ .ID }}" class="{{ if .Done }}completed{{ end }}">{{ .Title }}</label>
             </div>
-            <button class="delete-btn" onclick="deleteTask()">Видалити</button>
+            <button class="delete-btn" onclick="deleteTask({{ .ID }})">Видалити</button>
         </div>
         {{ end }}
-        <input type="text" id="new-task" placeholder="Введіть нове завдання...">
-        <button class="add-btn" onclick="addTask()">Додати завдання</button>
+        {{ if .Name }}
+            <input type="text" id="new-task" placeholder="Введіть нове завдання...">
+            <button class="add-btn" onclick="addTask()">Додати завдання</button>
+        {{ else }}
+            <input type="text" id="new-task" placeholder="Введіть нове завдання...">
+            <button class="add-btn" style="pointer-events: none; opacity: 0.6; cursor: not-allowed;" onclick="addTask()">Додати завдання</button>
+        {{ end }}
     </div>
 
     <script>
+        function logout() {
+            fetch("/logout", {
+                method: "POST",
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.message);
+            })
+            .catch(error => {
+                console.error("Помилка:", error);
+            });
+            setTimeout(() => {
+                document.location = window.location.origin
+                location.reload()
+            }, 20);
+        }
         function toggleComplete(checkbox, taskID) {
             const label = checkbox.nextElementSibling;
             if (checkbox.checked) {
@@ -109,7 +151,7 @@
             const itemIdElement = document.getElementById('title_todo' + taskID);
             const itemId = itemIdElement.innerText;
             const isChecked = checkbox.checked;
-            fetch("/todo/update_task", {
+            fetch("/update_task", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -134,15 +176,12 @@
                 alert('Будь ласка, введіть назву завдання.');
                 return;
             }
-            const uid_element = document.getElementById('uid_todo')
-            const uid = uid_element.innerText
-            fetch("/todo/add_task", {
+            fetch("/add_task", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    UID: uid,
                     Title: taskTitle
                 })
             })
@@ -154,11 +193,11 @@
                 console.error("Помилка:", error);
             });
         }
-
-        function deleteTask() {
-            const id_todo = document.getElementById('id_todo')
+        function deleteTask(idd) {
+            console.log(idd)
+            const id_todo = document.getElementById('id_todo_' + idd)
             const id = id_todo.innerText
-            fetch("/todo/delete_task", {
+            fetch("/delete_task", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

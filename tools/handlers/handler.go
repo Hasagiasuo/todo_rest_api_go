@@ -13,20 +13,9 @@ type Router struct {
 func InitHandlers(storage *storage.Storage) *Router {
 	router := gin.New()
 	router.LoadHTMLGlob("./tools/handlers/htmls/*")
-	user := router.Group("/user")
+	todo := router.Group("/")
 	{
-		user.POST("/", PostUser)
-		user.GET("/", GetUsers)
-		user.GET("/id=:id", func(c *gin.Context) {
-			GetUserById(c, storage)
-		})
-		user.POST("/", func(c *gin.Context) {
-			PushUser(c, storage)
-		})
-	}
-	todo := router.Group("/todo")
-	{
-		todo.GET("/id=:id", func(c *gin.Context) {
+		todo.GET("/", func(c *gin.Context) {
 			HandleUserTodo(c, storage)
 		})
 		todo.POST("/update_task", func(c *gin.Context) {
@@ -38,6 +27,19 @@ func InitHandlers(storage *storage.Storage) *Router {
 		todo.POST("/delete_task", func(c *gin.Context) {
 			HandleDeleteTodo(c, storage)
 		})
+		todo.GET("/signup", func(c *gin.Context) {
+			HGET_signup(c)
+		})
+		todo.POST("/signup", func(c *gin.Context) {
+			HPOST_signup(c, storage)
+		})
+		todo.GET("/login", func(c *gin.Context) {
+			HGET_login(c)
+		})
+		todo.POST("/login", func(c *gin.Context) {
+			HPOST_login(c, storage)
+		})
+		todo.POST("/logout", HPOST_logout)
 	}
 	return &Router{
 		Router: router,

@@ -79,6 +79,15 @@ func (storage Storage) GetUserById(id string) models.User {
 	return user
 }
 
+func (storage Storage) GetUserByEmail(email string) models.User {
+	user := models.User{}
+	query := `SELECT id, name, email, password FROM users WHERE email=$1`
+	if err := storage.DataBase.Get(&user, query, email); err != nil {
+		storage.Logger.Info("Cannot get user from database")
+	}
+	return user
+}
+
 func (storage Storage) GetUserByName(name string) models.User {
 	user := models.User{}
 	query := `SELECT id, name, email, password FROM users WHERE name=$1`
